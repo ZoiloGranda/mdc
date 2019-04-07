@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+<link rel="stylesheet" type="text/css" href="../styles/index.css" media="all">
+<body>
+  <form id="form">
+    <div class="form-group">
+      <label>Nombre: </label><input type="text" name="nombre" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Direccion: </label><input type="text" name="direccion" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Numero_cliente: </label><input type="text" name="numero_cliente" required class="form-control" data-pristine-type="number">
+    </div>
+    <div class="form-group">
+      <label>Fecha_inicio: </label><input type="text" name="fecha_inicio" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Fecha_fin: </label><input type="text" name="fecha_fin" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Saldo_inicial: </label><input type="text" name="saldo_inicial" required class="form-control" data-pristine-type="number">
+    </div>
+    <div class="form-group">
+      <label>Saldo_final: </label><input type="text" name="saldo_final" required class="form-control" data-pristine-type="number">
+    </div>
+    <div class="form-group">
+      <label>Rendimiento: </label><input type="text" name="rendimiento" required class="form-control" data-pristine-type="number">
+    </div>
+    Transacciones:<input type="button" onclick="nuevaTransaccion()" value="Añadir otra transaccion">
+    <div class="transaccion-group">
+      <hr/>
+      <div class="form-group">
+        <label>Fecha_transaccion: </label><input type="text" name="fecha_transaccion" required class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Transaccion_id: </label><input type="text" name="transaccion_id" required class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Evento_negocio: </label><input type="text" name="evento_negocio" required class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Debito: </label><input type="text" name="debito" required class="form-control" data-pristine-type="number">
+      </div>
+      <div class="form-group">
+        <label>Credito: </label><input type="text" name="credito" required class="form-control" data-pristine-type="number">
+      </div>
+    </div>
+    <input type="submit" name="" value="Listo" id="listo">
+    
+  </form>
+</body>
+<script type="text/javascript" src="../scripts/listo.js"></script>
+<script
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+crossorigin="anonymous"></script>
+<script type="text/javascript" src="../scripts/pristine.js"></script>
+</html>

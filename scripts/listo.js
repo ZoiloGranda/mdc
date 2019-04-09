@@ -1,4 +1,5 @@
 var pristine;
+var clienteNumero = 0;
 window.onload = function () {
   init();
   // create the pristine instance
@@ -54,7 +55,8 @@ function init(){
   })
   
   $('#nuevoCliente').click(function() {
-    var addClientNumero = $('.client-template')[0].innerHTML.replace(`data-cliente-numero=/[0-9]+/`, `data-cliente-numero=${clienteNumero}`)
+    var addClientNumero = $('.client-template')[0].innerHTML.replace(/data-cliente-numero="[0-9]+"/g,`data-cliente-numero="${clienteNumero+1}"`)
+    clienteNumero++;
     $('.client-group').append(addClientNumero)
     pristine.reset() 
   })

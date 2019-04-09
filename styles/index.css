@@ -24,7 +24,7 @@ label {
 }
 
 .form-group .form-control {
-  width: 40%;
+  width: 95%;
   outline: none;
   padding: 5px;
   border: none;
@@ -60,5 +60,13 @@ hr {
     border-top: 1px solid #ccc;
     margin: 1em 0;
     padding: 0;
-    width: 50%
+    width: 90%
+}
+.left-form{
+  display: inline-block;
+  float:left;
+}
+.right-form{
+  display: inline-block;
+  float:right
 }

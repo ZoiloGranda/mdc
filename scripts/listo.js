@@ -1,20 +1,15 @@
 var pristine;
 window.onload = function () {
-  cambiarMensajes();
-  var form = document.getElementById("form");
+  init();
   // create the pristine instance
-  pristine = new Pristine(form);
-  form.addEventListener('submit', function (e) {
+  pristine = new Pristine(document.getElementById('form'));
+}
+function init(){
+  cambiarMensajes()
+  $('form').submit(function(e) {
     e.preventDefault();
-    // console.log(form);
-    // console.log(new FormData(form));
-    // var formdata = new FormData(form)
-    // console.log(formdata);
-    // var data={}
-    // for (var [key, value] of formdata.entries()) { 
-    //   data[key]=value
-    // }
-    var data = $(form).serialize()
+    var data = $('form').serialize()
+    console.log(data);
     // check if the form is valid
     var valid = pristine.validate(); // returns true or false
     console.log(valid);
@@ -30,22 +25,53 @@ window.onload = function () {
       });
     }
   });
+  
+  function cambiarMensajes() {
+    var textInputs =$('input[type=text]') 
+    textInputs.each(function( index ) {
+      $(this).attr('data-pristine-required-message', "Este campo es requerido" )
+    });
+    var numberInputs =$('input[data-pristine-type=number]') 
+    numberInputs.each(function( index ) {
+      $(this).attr('data-pristine-number-message', "Este campo debe ser solo numeros" )
+    });
+  }
+  
+  $('#nuevaTransaccion').click(function() {
+    $('.transaccion-group').append($('.transaccion-template')[0].innerHTML )
+    pristine.reset() 
+  })
+  
+  $('input[name=saldo_inicial]').change(function(e){
+    var saldoInicialCliente = parseFloat($(e.target).val());
+    var saldo_inicial_empresa = parseFloat($('input[name=saldo_inicial_empresa]').val())
+    var ganancia_neta_empresa = parseFloat($('input[name=ganancia_neta_empresa]').val())
+    var gananciaCliente = saldoInicialCliente*ganancia_neta_empresa/saldo_inicial_empresa;
+    var saldoFinal = saldoInicialCliente+gananciaCliente
+    $('input[name=saldo_final]').val(saldoFinal)
+    var rendimiento = gananciaCliente*100/saldoInicialCliente
+    $('input[name=rendimiento]').val(rendimiento)
+  })
+  
+  $('#nuevoCliente').click(function() {
+    var addClientNumero = $('.client-template')[0].innerHTML.replace(`data-cliente-numero=/[0-9]+/`, `data-cliente-numero=${clienteNumero}`)
+    $('.client-group').append(addClientNumero)
+    pristine.reset() 
+  })
 }
+  
 
-function cambiarMensajes() {
-  var textInputs =$('input[type=text]') 
-  textInputs.each(function( index ) {
-    $(this).attr('data-pristine-required-message', "Este campo es requerido" )
-  });
-  var numberInputs =$('input[data-pristine-type=number]') 
-  numberInputs.each(function( index ) {
-    $(this).attr('data-pristine-number-message', "Este campo debe ser solo numeros" )
-  });
-}
 
-function nuevaTransaccion() {
-  console.log($('.transaccion-group'));
-  console.log($('.transaccion-group').last());
-  $('#listo').before($('.transaccion-group')[0].innerHTML )
-  pristine.reset() 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+

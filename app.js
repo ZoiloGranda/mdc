@@ -42,11 +42,11 @@ function formatearTransacciones(data) {
     }
   }else {
     data.transacciones[0]={
-      fecha_transaccion:data.fecha_transaccion[i],
-      transaccion_id:data.transaccion_id[i],
-      evento_negocio:data.evento_negocio[i],
-      debito:data.debito[i],
-      credito:data.credito[i]
+      fecha_transaccion:data.fecha_transaccion,
+      transaccion_id:data.transaccion_id,
+      evento_negocio:data.evento_negocio,
+      debito:data.debito,
+      credito:data.credito
     }
   }
   delete data.fecha_transaccion

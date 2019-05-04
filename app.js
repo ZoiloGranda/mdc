@@ -28,8 +28,20 @@ app.listen(3000, function () {
 
 function formatearTransacciones(data) {
   data.transacciones=[];
-  for (var i = 0; i < data.fecha_transaccion.length; i++) {
-    data.transacciones[i]={
+  var variasTransacciones = data.fecha_transaccion instanceof Array;
+  console.log(data.fecha_transaccion instanceof Array);
+  if (variasTransacciones) {
+    for (var i = 0; i < data.fecha_transaccion.length; i++) {
+      data.transacciones[i]={
+        fecha_transaccion:data.fecha_transaccion[i],
+        transaccion_id:data.transaccion_id[i],
+        evento_negocio:data.evento_negocio[i],
+        debito:data.debito[i],
+        credito:data.credito[i]
+      }
+    }
+  }else {
+    data.transacciones[0]={
       fecha_transaccion:data.fecha_transaccion[i],
       transaccion_id:data.transaccion_id[i],
       evento_negocio:data.evento_negocio[i],
@@ -50,15 +62,11 @@ function generarDoc(data) {
   //Load the docx file as a binary
   var content = fs
   .readFileSync(path.resolve(__dirname, 'plantillas/standard.docx'), 'binary');
-  
   var zip = new JSZip(content);
-  
   var doc = new Docxtemplater();
   doc.loadZip(zip);
-  
   //set the templateVariables
   doc.setData(data);
-  
   try {
     // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
     doc.render()
@@ -75,11 +83,8 @@ function generarDoc(data) {
     // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
     throw error;
   }
-  
   var buf = doc.getZip()
   .generate({type: 'nodebuffer'});
-  
   // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
   fs.writeFileSync(path.resolve(__dirname, 'output.docx'), buf);
-  
 }

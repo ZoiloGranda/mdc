@@ -7,6 +7,7 @@ window.onload = function () {
 }
 function init(){
   cambiarMensajes()
+  bindSaldoInicialChange();
   $('form').submit(function(e) {
     e.preventDefault();
     var data = $('form').serialize()
@@ -43,25 +44,31 @@ function init(){
     pristine.reset() 
   })
   
-  $('input[name=saldo_inicial]').change(function(e){
-    var saldoInicialCliente = parseFloat($(e.target).val());
-    var saldo_inicial_empresa = parseFloat($('input[name=saldo_inicial_empresa]').val())
-    var ganancia_neta_empresa = parseFloat($('input[name=ganancia_neta_empresa]').val())
-    var gananciaCliente = saldoInicialCliente*ganancia_neta_empresa/saldo_inicial_empresa;
-    var saldoFinal = saldoInicialCliente+gananciaCliente
-    $('input[name=saldo_final]').val(saldoFinal)
-    var rendimiento = gananciaCliente*100/saldoInicialCliente
-    $('input[name=rendimiento]').val(rendimiento)
-  })
+  
+  function bindSaldoInicialChange(){
+    $('input[name=saldo_inicial]').change(function (e) {
+      var saldoInicialCliente = parseFloat($(e.target).val());
+      var clienteNumero = e.target.dataset.clienteNumero
+      var saldo_inicial_empresa = parseFloat($('input[name=saldo_inicial_empresa]').val())
+      var ganancia_neta_empresa = parseFloat($('input[name=ganancia_neta_empresa]').val())
+      var gananciaCliente = saldoInicialCliente*ganancia_neta_empresa/saldo_inicial_empresa;
+      var saldoFinal = saldoInicialCliente+gananciaCliente
+      $(`input[name=saldo_final][data-cliente-numero=${clienteNumero}]`).val(saldoFinal)
+      var rendimiento = gananciaCliente*100/saldoInicialCliente;
+      $(`input[name=rendimiento][data-cliente-numero=${clienteNumero}]`).val(rendimiento);
+    })
+  }
+  
   
   $('#nuevoCliente').click(function() {
     var addClientNumero = $('.client-template')[0].innerHTML.replace(/data-cliente-numero="[0-9]+"/g,`data-cliente-numero="${clienteNumero+1}"`)
     clienteNumero++;
     $('.client-group').append(addClientNumero)
+    bindSaldoInicialChange();
     pristine.reset() 
   })
 }
-  
+
 
 
 

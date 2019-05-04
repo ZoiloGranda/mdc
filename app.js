@@ -29,7 +29,6 @@ app.listen(3000, function () {
 function formatearTransacciones(data) {
   data.transacciones=[];
   var variasTransacciones = data.fecha_transaccion instanceof Array;
-  console.log(data.fecha_transaccion instanceof Array);
   if (variasTransacciones) {
     for (var i = 0; i < data.fecha_transaccion.length; i++) {
       data.transacciones[i]={
@@ -54,11 +53,39 @@ function formatearTransacciones(data) {
   delete data.evento_negocio
   delete data.debito
   delete data.credito
-  console.log(data);
-  generarDoc(data)
+  formatearClientes(data)
 }
 
-function generarDoc(data) {
+function formatearClientes(data) {
+  var dataPorClientes = {}
+  var dataPorClientes = Object.assign(dataPorClientes, data);
+  var variosClientes = data.nombre instanceof Array;
+  if (variosClientes) {
+    for (var i = 0; i < data.nombre.length; i++) {
+      dataPorClientes.nombre = data.nombre[i];
+      dataPorClientes.direccion = data.direccion[i];
+      dataPorClientes.numero_cliente = data.numero_cliente[i];
+      dataPorClientes.fecha_inicio = data.fecha_inicio[i];
+      dataPorClientes.fecha_fin = data.fecha_fin[i];
+      dataPorClientes.saldo_inicial = data.saldo_inicial[i];
+      dataPorClientes.saldo_final = data.saldo_final[i];
+      dataPorClientes.rendimiento = data.rendimiento[i];
+      generarDoc(dataPorClientes)
+    }
+  }else {
+    dataPorClientes.nombre = data.nombre;
+    dataPorClientes.direccion = data.direccion;
+    dataPorClientes.numero_cliente = data.numero_cliente;
+    dataPorClientes.fecha_inicio = data.fecha_inicio;
+    dataPorClientes.fecha_fin = data.fecha_fin;
+    dataPorClientes.saldo_inicial = data.saldo_inicial;
+    dataPorClientes.saldo_final = data.saldo_final;
+    dataPorClientes.rendimiento = data.rendimiento;
+    generarDoc(dataPorClientes)
+  }
+}
+
+function generarDoc(dataPorClientes) {
   //Load the docx file as a binary
   var content = fs
   .readFileSync(path.resolve(__dirname, 'plantillas/standard.docx'), 'binary');
@@ -66,11 +93,11 @@ function generarDoc(data) {
   var doc = new Docxtemplater();
   doc.loadZip(zip);
   //set the templateVariables
-  doc.setData(data);
+  doc.setData(dataPorClientes);
   try {
     // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
     doc.render()
-    console.log('output generado');
+    console.log('documento generado');
   }
   catch (error) {
     var e = {
@@ -83,8 +110,12 @@ function generarDoc(data) {
     // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
     throw error;
   }
-  var buf = doc.getZip()
-  .generate({type: 'nodebuffer'});
+  var buf = doc.getZip().generate({type: 'nodebuffer'});
   // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
-  fs.writeFileSync(path.resolve(__dirname, 'output.docx'), buf);
+  var filePath = path.resolve(`${__dirname}/documentosProcesados/${dataPorClientes.nombre}.docx`);
+  try {
+  fs.writeFileSync(filePath, buf);  
+  } catch (e) {
+    console.log(e);
+  }
 }

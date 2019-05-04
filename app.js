@@ -16,17 +16,8 @@ app.get('/', function (req, res) {
   res.sendFile(path.resolve(__dirname,'views/index.html'));
 });
 
-app.post('/procesardoc', function (req, res) {
-  console.log(req.body);
-  res.send({message:'ok'})
-  formatearTransacciones(req.body)
-});
-
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
-
-function formatearTransacciones(data) {
+var formatearTransacciones = function (req, res, next) {
+  var data = req.body;
   data.transacciones=[];
   var variasTransacciones = data.fecha_transaccion instanceof Array;
   if (variasTransacciones) {
@@ -48,15 +39,16 @@ function formatearTransacciones(data) {
       credito:data.credito
     }
   }
-  delete data.fecha_transaccion
-  delete data.transaccion_id
-  delete data.evento_negocio
-  delete data.debito
-  delete data.credito
-  formatearClientes(data)
+  delete data.fecha_transaccion;
+  delete data.transaccion_id;
+  delete data.evento_negocio;
+  delete data.debito;
+  delete data.credito;
+  next()
 }
 
-function formatearClientes(data) {
+var formatearClientes = function (req, res, next) {
+  var data = req.body
   var dataPorClientes = {}
   var dataPorClientes = Object.assign(dataPorClientes, data);
   var variosClientes = data.nombre instanceof Array;
@@ -70,7 +62,9 @@ function formatearClientes(data) {
       dataPorClientes.saldo_inicial = data.saldo_inicial[i];
       dataPorClientes.saldo_final = data.saldo_final[i];
       dataPorClientes.rendimiento = data.rendimiento[i];
-      generarDoc(dataPorClientes)
+      req.dataPorClientes = dataPorClientes;
+      next()
+      // generarDoc(dataPorClientes)
     }
   }else {
     dataPorClientes.nombre = data.nombre;
@@ -81,11 +75,14 @@ function formatearClientes(data) {
     dataPorClientes.saldo_inicial = data.saldo_inicial;
     dataPorClientes.saldo_final = data.saldo_final;
     dataPorClientes.rendimiento = data.rendimiento;
-    generarDoc(dataPorClientes)
+    req.dataPorClientes = dataPorClientes;
+    next()
+    // generarDoc(dataPorClientes)
   }
 }
 
-function generarDoc(dataPorClientes) {
+var generarDoc = function(req, res, next){
+  var dataPorClientes = req.dataPorClientes;
   //Load the docx file as a binary
   var content = fs
   .readFileSync(path.resolve(__dirname, 'plantillas/standard.docx'), 'binary');
@@ -114,8 +111,23 @@ function generarDoc(dataPorClientes) {
   // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
   var filePath = path.resolve(`${__dirname}/documentosProcesados/${dataPorClientes.nombre}.docx`);
   try {
-  fs.writeFileSync(filePath, buf);  
+    fs.writeFileSync(filePath, buf);  
   } catch (e) {
     console.log(e);
   }
 }
+
+app.use(formatearTransacciones);
+app.use(formatearClientes);
+app.use(generarDoc);
+
+app.post('/procesardoc', function (req, res, next) {
+  console.log(req.body);
+  // res.send({message:'ok'})
+  // formatearTransacciones(req.body)
+});
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});
+

@@ -23,6 +23,11 @@ function init(){
         type: 'POST',
         success: function(data){
           console.log(data);
+          handleSuccess(data)
+        },
+        error:function (jqXHR) {
+          console.log(jqXHR);
+          handleErrors(jqXHR.responseJSON)
         }
       });
     }
@@ -67,6 +72,14 @@ function init(){
     bindSaldoInicialChange();
     pristine.reset() 
   })
+  
+  function handleErrors(responseJSON) {
+    // if (responseJSON.errorCode==='BUSY') {
+      alert(JSON.stringify(responseJSON, null, 3))
+    // }else {
+      // alert('Algun error paso, llamame a ver')
+    // }
+  }
 }
 
 

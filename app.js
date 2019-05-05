@@ -17,6 +17,7 @@ app.get('/', function (req, res) {
 });
 
 var formatearTransacciones = function (req, res, next) {
+  req.responseMessage = {};
   var data = req.body;
   data.transacciones=[];
   var variasTransacciones = data.fecha_transaccion instanceof Array;
@@ -63,8 +64,10 @@ var formatearClientes = function (req, res, next) {
       dataPorClientes.saldo_final = data.saldo_final[i];
       dataPorClientes.rendimiento = data.rendimiento[i];
       req.dataPorClientes = dataPorClientes;
+      if (i===data.nombre.length) {
+        req.ultimoCliente = true;
+      }
       next()
-      // generarDoc(dataPorClientes)
     }
   }else {
     dataPorClientes.nombre = data.nombre;
@@ -76,8 +79,8 @@ var formatearClientes = function (req, res, next) {
     dataPorClientes.saldo_final = data.saldo_final;
     dataPorClientes.rendimiento = data.rendimiento;
     req.dataPorClientes = dataPorClientes;
+    req.ultimoCliente = true;
     next()
-    // generarDoc(dataPorClientes)
   }
 }
 
@@ -94,7 +97,7 @@ var generarDoc = function(req, res, next){
   try {
     // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
     doc.render()
-    console.log('documento generado');
+    console.log('documento renderizado');
   }
   catch (error) {
     var e = {
@@ -111,20 +114,36 @@ var generarDoc = function(req, res, next){
   // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
   var filePath = path.resolve(`${__dirname}/documentosProcesados/${dataPorClientes.nombre}.docx`);
   try {
-    fs.writeFileSync(filePath, buf);  
+    fs.writeFileSync(filePath, buf);
+    req.responseMessage[dataPorClientes.numero_cliente]=`Documento de ${dataPorClientes.nombre} guardado`
+    next()
   } catch (e) {
     console.log(e);
+    if (e.code==='EBUSY') {
+      req.responseMessage[dataPorClientes.numero_cliente]=`El documento que vas a generar esta abierto en word,
+        cierralo y lo vuelves a intentar,
+        se estaba procesando ${dataPorClientes.nombre}`,
+      res.status(400);
+    }
+    next()
+  }
+}
+
+var enviarRespuesta = function(req, res, next){
+  console.log('req.ultimoCliente ',req.ultimoCliente);
+  console.log('req.responseMessage ',req.responseMessage);
+  if (req.ultimoCliente) {
+    res.send(req.responseMessage)
   }
 }
 
 app.use(formatearTransacciones);
 app.use(formatearClientes);
 app.use(generarDoc);
+app.use(enviarRespuesta);
 
 app.post('/procesardoc', function (req, res, next) {
   console.log(req.body);
-  // res.send({message:'ok'})
-  // formatearTransacciones(req.body)
 });
 
 app.listen(3000, function () {

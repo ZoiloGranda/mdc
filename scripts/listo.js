@@ -75,6 +75,7 @@ function init(){
   
   function handleErrors(responseJSON) {
     // if (responseJSON.errorCode==='BUSY') {
+    $('#ex1').modal();
       alert(JSON.stringify(responseJSON, null, 3))
     // }else {
       // alert('Algun error paso, llamame a ver')
